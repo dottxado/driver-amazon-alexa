@@ -1,5 +1,5 @@
 {
-    "name": "dottxado/driver-amazon-alexa",
+    "name": "botman/driver-amazon-alexa",
     "license": "MIT",
     "description": "Amazon Alexa driver for BotMan",
     "keywords": [
@@ -13,9 +13,6 @@
         {
             "name": "Marcel Pociot",
             "email": "m.pociot@gmail.com"
-        },
-        {
-            "name": "Erika Gili"
         }
     ],
     "require": {
@@ -51,8 +48,5 @@
                 "BotMan\\Drivers\\AmazonAlexa\\Providers\\AmazonAlexaServiceProvider"
             ]
         }
-    },
-    "replace": {
-        "botman/driver-amazon-alexa": "*"
     }
 }
