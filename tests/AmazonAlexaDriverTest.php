@@ -2,10 +2,11 @@
 
 namespace Tests;
 
+use BotMan\Drivers\AmazonAlexa\Exceptions\AmazonValidationException;
 use Mockery as m;
 use BotMan\BotMan\Http\Curl;
-use BotMan\BotMan\Messages\Outgoing\Question;
 use PHPUnit\Framework\TestCase;
+use BotMan\BotMan\Messages\Outgoing\Question;
 use Symfony\Component\HttpFoundation\Request;
 use BotMan\BotMan\Drivers\Events\GenericEvent;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,9 +46,8 @@ class AmazonAlexaDriverTest extends TestCase
   },
   "request": {
     "type": "' . $type . '",
-    "requestId": "request_id",';
-        if ($type === 'IntentRequest') {
-            $responseData .= '"intent": {
+    "requestId": "request_id",
+    "intent": {
       "name": "intent_name",
       "slots": {
         "location": {
@@ -55,9 +55,7 @@ class AmazonAlexaDriverTest extends TestCase
           "value": "Berlin"
         }
       }
-    },';
-        }
-        $responseData .= '
+    },
     "locale": "de-DE",
     "timestamp": "2017-09-27T20:50:37Z"
   },
@@ -94,10 +92,12 @@ class AmazonAlexaDriverTest extends TestCase
         $this->assertTrue($driver->matchesRequest());
 
         $driver = $this->getValidDriver(null, 'IntentRequest', ['amazon-alexa' => ['enableValidation' => true]]);
-        $this->assertFalse($driver->matchesRequest());
+        $this->expectException(AmazonValidationException::class);
+        $driver->matchesRequest();
 
         $driver = $this->getValidDriver(null, 'IntentRequest', ['amazon-alexa' => ['enableValidation' => true, 'skillId' => 'app_id']]);
-        $this->assertFalse($driver->matchesRequest());
+        $this->expectException(AmazonValidationException::class);
+        $driver->matchesRequest();
     }
 
     /** @test */
@@ -121,20 +121,6 @@ class AmazonAlexaDriverTest extends TestCase
     {
         $driver = $this->getValidDriver();
         $this->assertSame('intent_name', $driver->getMessages()[0]->getText());
-    }
-
-    /** @test */
-    public function it_returns_the_message_object_for_launch()
-    {
-        $driver = $this->getValidDriver(null, 'LaunchRequest');
-        $this->assertTrue(is_array($driver->getMessages()));
-    }
-
-    /** @test */
-    public function it_returns_the_message_object_for_session_ended()
-    {
-        $driver = $this->getValidDriver(null, 'SessionEndedRequest');
-        $this->assertTrue(is_array($driver->getMessages()));
     }
 
     /** @test */
